@@ -13,6 +13,12 @@ endif()
 # Name of the project
 project(K9)
 
+message(STATUS "${PROJECT_NAME} is located in ${CMAKE_CURRENT_SOURCE_DIR}")
+
+# Specify C++14 as the standard
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Specify linker flags - set CMAKE_CURRENT_BINARY_DIR to append the current build directory
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,'$ORIGIN'" )
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,'$ORIGIN'" )
@@ -37,30 +43,30 @@ else()
 endif()
 message(STATUS "====================================")
 
-# Get all source files and headers
-file(GLOB SOURCES
-    src/*.h
-    src/*.cpp)
+MACRO(HEADER_DIRECTORIES return_list curr_dir)
+    FILE(GLOB_RECURSE new_list ${curr_dir}/*.h ${curr_dir}/*.hpp)
+    SET(dir_list "")
+    FOREACH(file_path ${new_list})
+        GET_FILENAME_COMPONENT(dir_path ${file_path} PATH)
+        SET(dir_list ${dir_list} ${dir_path})
+    ENDFOREACH()
+    LIST(REMOVE_DUPLICATES dir_list)
+    SET(${return_list} ${dir_list})
+ENDMACRO()
 
-# Create executable PROJECT_NAME
-add_executable(${PROJECT_NAME} ${SOURCES})
+MACRO(SOURCE_FILES return_list curr_dir)
+    FILE(GLOB_RECURSE new_list ${curr_dir}/*.h ${curr_dir}/*.cpp ${curr_dir}/*.hpp ${curr_dir}/*.inl)
+    SET(dir_list "")
+    FOREACH(file_path ${new_list})
+        message(STATUS "[INFO] file_path: ${file_path}")
+        SET(dir_list ${dir_list} ${file_path})
+    ENDFOREACH()
+    LIST(REMOVE_DUPLICATES dir_list)
+    SET(${return_list} ${dir_list})
+ENDMACRO()
+
+# Include CMake files
+add_subdirectory(K9-Core)
+add_subdirectory(K9-Sandbox)
 
 
-# Specify C++14 as the standard
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
-
-
-# Add include directories
-set(K9_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(INTERNAL_DIRS
-    ${K9_ROOT_DIR}
-    ${K9_ROOT_DIR}/src
-    ${K9_ROOT_DIR}/libs)
-
-include_directories(${INTERNAL_DIRS})
-
-# Find required libraries
-find_package(OpenGL REQUIRED)
-
-#Link libraries
-target_link_libraries(${PROJECT_NAME} GL SDL2)
