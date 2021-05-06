@@ -1,1 +1,0 @@
-/usr/bin/clang++-12 -g  -Wl,-rpath,'$ORIGIN' -rdynamic CMakeFiles/K9.dir/src/main.cpp.o -o K9 

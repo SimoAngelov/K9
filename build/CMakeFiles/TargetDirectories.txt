@@ -1,3 +1,0 @@
-/media/simo/New Volume/Linux/workspace/K9/build/CMakeFiles/rebuild_cache.dir
-/media/simo/New Volume/Linux/workspace/K9/build/CMakeFiles/edit_cache.dir
-/media/simo/New Volume/Linux/workspace/K9/build/CMakeFiles/K9.dir

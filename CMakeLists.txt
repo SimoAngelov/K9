@@ -54,6 +54,13 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 set(K9_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INTERNAL_DIRS
     ${K9_ROOT_DIR}
-    ${K9_ROOT_DIR}/src)
+    ${K9_ROOT_DIR}/src
+    ${K9_ROOT_DIR}/libs)
 
 include_directories(${INTERNAL_DIRS})
+
+# Find required libraries
+find_package(OpenGL REQUIRED)
+
+#Link libraries
+target_link_libraries(${PROJECT_NAME} GL SDL2)
