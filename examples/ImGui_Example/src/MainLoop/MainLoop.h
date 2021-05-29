@@ -4,8 +4,6 @@
 #include <SDL_opengl.h>
 #include <glm/glm.hpp>
 
-#include <ImGUIWrapper/ImGUIWrapper.h>
-#include <Window/Window.h>
 #include <Renderer/Texture.h>
 
 namespace K9
@@ -52,15 +50,6 @@ namespace K9
 		void OnImGUIRender();
 
 	private:
-		/// <summary>
-		/// Main window.
-		/// </summary>
-		Window m_window;
-
-		/// <summary>
-		/// ImGUI Wrapper
-		/// </summary>
-		ImGUIWrapper m_imGUI;
 
 		/// <summary>
 		/// Used to store any events from the OS
