@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.7.2)
 add_library(imgui
     		${CMAKE_CURRENT_SOURCE_DIR}/imconfig.h
 			${CMAKE_CURRENT_SOURCE_DIR}/imgui.h

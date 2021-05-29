@@ -1,10 +1,12 @@
 #include "Window.h"
-#include <SDL.h>
-#include <SDL_opengl.h>
 #include <iostream>
+#include <Renderer/Renderer2D.h>
 
 namespace K9
 {
+	Window::Window() : m_ptrWindow{ nullptr }, m_size{}, m_bgrColor{}
+	{
+	}
 
 	bool Window::Init(const std::string& strTitle, int nWidth, int nHeight)
 	{
@@ -15,6 +17,7 @@ namespace K9
 			std::cerr << "Error failed to create window!\n";
 			return false;
 		}
+		m_size = SDL_Rect{ 0, 0, nWidth, nHeight };
 		return true;
 	}
 
@@ -33,6 +36,11 @@ namespace K9
 	SDL_Window* Window::GetWindow()
 	{
 		return m_ptrWindow;
+	}
+
+	const SDL_Rect& Window::GetSize() const
+	{
+		return m_size;
 	}
 
 	void Window::SetBackgroundColor(const glm::vec4& bgrColor)

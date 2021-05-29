@@ -6,6 +6,7 @@
 
 #include <ImGUIWrapper/ImGUIWrapper.h>
 #include <Window/Window.h>
+#include <Renderer/Texture.h>
 
 namespace K9
 {
@@ -75,5 +76,7 @@ namespace K9
 		/// ImGui color value for the window.
 		/// </summary>
 		glm::vec4 m_imguiColor;
+
+		Texture m_texFox;
 	};
 } // namespace K9

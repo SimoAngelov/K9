@@ -20,8 +20,9 @@ namespace K9
 		/// Initialize member fields.
 		/// </summary>
 		/// <param name="ptrWindow"> Window reference. </param>
+		/// <param name="ptrContext"> OpenGL context reference. </param>
 		/// <returns> True if the initialization was successful. </returns>
-		bool Init(SDL_Window* ptrWindow);
+		bool Init(SDL_Window* ptrWindow, SDL_GLContext ptrContext);
 
 		/// <summary>
 		/// Shutdown and free resources.
@@ -45,21 +46,10 @@ namespace K9
 		void HandleEvent(const SDL_Event& event);
 
 	private:
-		/// <summary>
-		/// Create an OpenGL context.
-		/// </summary>
-		bool CreateOpenGLContext();
-
-		/// <summary>
-		/// Destroy the OpenGL context.
-		/// </summary>
-		void DestroyOpenGLContext();
-
-	private:
 		/* Window reference. */
 		SDL_Window* m_ptrWindow;
 
-		/* OpenGL context. */
+		/* OpenGL context reference. */
 		SDL_GLContext m_ptrContext;
 	};
 } // namespace K9

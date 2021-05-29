@@ -1,9 +1,8 @@
 #pragma once
 #include <string>
 #include <glm/glm.hpp>
-
-/* Forward Declarations.*/
-struct SDL_Window;
+#include <SDL.h>
+#include <SDL_opengl.h>
 
 namespace K9
 {
@@ -13,6 +12,9 @@ namespace K9
 	class Window
 	{
 	public:
+		Window();
+		virtual ~Window() = default;
+
 		/// <summary>
 		/// Initialize the main window.
 		/// </summary>
@@ -39,6 +41,12 @@ namespace K9
 		SDL_Window* GetWindow();
 
 		/// <summary>
+		/// Retrieve the window size.
+		/// </summary>
+		/// <returns> m_size </returns>
+		const SDL_Rect& GetSize() const;
+
+		/// <summary>
 		/// Set the window background color.
 		/// </summary>
 		/// <param name="bgrColor"> Background color to be set. </param>
@@ -52,6 +60,11 @@ namespace K9
 	private:
 		/* Main window. */
 		SDL_Window* m_ptrWindow;
+
+		/// <summary>
+		/// Window size.
+		/// </summary>
+		SDL_Rect m_size;
 
 		/// <summary>
 		/// Background color.

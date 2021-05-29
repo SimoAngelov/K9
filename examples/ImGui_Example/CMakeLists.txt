@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.7.2)
 
 # Name of the project
 project(ImGUI_Example)
@@ -6,7 +6,7 @@ project(ImGUI_Example)
 message(STATUS "${PROJECT_NAME} is located in ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Specify C++14 as the standard
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
@@ -68,21 +68,40 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD        # Adds a post-build 
         ${CMAKE_CURRENT_BINARY_DIR})                        # <--this is out-file path 
 endfunction()
 
+# Function to copy assets based on the provided script
+# arg[0] copy_assets - name of the function
+# arg[1] - argTarget - target dependency
+# arg[2] argCopyScriptPath - path to script that will copy the fo
+function(copy_assets argTarget argCopyScriptPath)
+if((NOT "${argTarget}" STREQUAL "") AND (NOT "${argCopyScriptPath}" EQUAL ""))
+        add_custom_target(${argTarget} 
+        COMMAND ${CMAKE_COMMAND} -P ${argCopyScriptPath}
+    )
+    add_dependencies(${BINARY} ${argTarget})
+    message(STATUS "copy_assets argTarget: ${argTarget} \t argCopyScriptPath: ${argCopyScriptPath}")
+endif()
+endfunction()
+
 # Function for adding a linking a library in Windows.
 # arg[0] - add_lib_windows - name of the function
 # arg[1] - argIncludePath - path to the library include directory
 # arg[2] - argLibsToAdd - name of the libraries to be added
 # arg[3] - argFilesToCopy - files to be copied after build is finished. "" if there're none.
-function(add_lib_windows argIncludePath argLibsToAdd argFilesToCopy)
-	# Add the include directory to the project
-	target_include_directories(${BINARY} PUBLIC ${argIncludePath})
-	
-	# Link the static library
-    target_link_libraries(${BINARY} PUBLIC ${argLibsToAdd})
+function(add_lib_windows argIncludePath argLibsToAdd argFilesToCopy )
 
-    if(NOT argFilesToCopy STREQUAL "")
+    if(NOT "${argIncludePath}" STREQUAL "")
+	    # Add the include directory to the project
+	    target_include_directories(${BINARY} PUBLIC ${argIncludePath})
+    endif()
+	
+    if(NOT "${argLibsToAdd}" STREQUAL "")
+	    # Link the static library
+        target_link_libraries(${BINARY} PUBLIC ${argLibsToAdd})
+    endif()
+
+    if(NOT "${argFilesToCopy}" STREQUAL "")
         # After the buld is finished, copy the argFilesToCopy to the output directory, where the binary executable is located
-        post_build_copy(${argFilesToCopy})
+        post_build_copy("${argFilesToCopy}")
     endif()
     message(STATUS "[add_lib_windows] ${BINARY}\n argIncludePath:  ${argIncludePath} \n argLibsToAdd: ${argLibsToAdd}\n argFilesToCopy: ${argFilesToCopy}")
 endfunction()
@@ -110,7 +129,7 @@ list(LENGTH source_file_list source_file_list_count)
 message(STATUS "[INFO] ${BINARY} Found ${source_file_list_count} source files.")
 
 # Create BINARY executable
-add_executable(${BINARY} ${source_file_list} "src/ImGUIWrapper/ImGUIWrapper.h" "src/ImGUIWrapper/ImGUIWrapper.cpp" "src/Window/Window.h" "src/Window/Window.cpp" "src/MainLoop/MainLoop.h" "src/MainLoop/MainLoop.cpp")
+add_executable(${BINARY} ${source_file_list})
 
 # Add include directories
 set(LIBS ${CMAKE_CURRENT_SOURCE_DIR}/libs)
@@ -128,6 +147,7 @@ if(WIN32)
 	set(OpenGL_GL_PREFERENCE GLVND) 
 	find_package(OpenGL REQUIRED)
 	target_link_libraries(${BINARY} PUBLIC opengl32)
+    add_definitions(-DGLFW_INCLUDE_NONE)
 
     set(LIB_INCLUDE_PATH "")
     set(LIB_TO_ADD "")
@@ -135,7 +155,13 @@ if(WIN32)
 
 	# Setup SDL
 	add_subdirectory(${LIBS}/SDL2)
-    set_lib_sdl2("${LIB_PATH_SDL}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    set_lib_sdl2("${LIB_PATH_SDL}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY DEPENDENCY_TARGET)
+    add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
+	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+
+    # Setup SDL_image
+    add_subdirectory(${LIBS}/SDL2_image)
+    set_lib_sdl2_image("${LIB_PATH_SDL_IMAGE}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY DEPENDENCY_TARGET)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
@@ -157,4 +183,6 @@ if(WIN32)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
+    # Copy assets folder to the build directory
+    copy_assets("assets" "${CMAKE_CURRENT_SOURCE_DIR}/copy_resources.cmake")
 endif(WIN32)

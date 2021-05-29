@@ -1,6 +1,8 @@
 #include "MainLoop.h"
 #include <iostream>
 #include <imgui.h>
+#include <SDL_image.h>
+#include <Renderer/Renderer2D.h>
 
 namespace K9
 {
@@ -13,16 +15,44 @@ namespace K9
 		// Initialize SDL with video
 		SDL_Init(SDL_INIT_VIDEO);
 
-		if (!m_window.Init("ImGUI Example", 1280, 720))
+		int nWidth = 1280;
+		int nHeight = 720;
+
+		if (!m_window.Init("ImGUI Example", nWidth, nHeight))
 		{
 			std::cerr << "MainLoop: Failed to init m_window!\n";
 			return false;
 		}
-		if (!m_imGUI.Init(m_window.GetWindow()))
+
+		if (!Renderer2D::Ref().Init(m_window.GetWindow()))
+		{
+			std::cerr << "MainLoop::Init: Failed to init Renderer2D\n";
+			return false;
+		}
+		Renderer2D::Ref().SetScreenSize(m_window.GetSize());
+
+		if (!m_imGUI.Init(m_window.GetWindow(), Renderer2D::Ref().GetContext()))
 		{
 			std::cerr << "MainLoop: Failed to init m_window!\n";
 			return false;
 		}
+
+		// load support for the JPG and PNG image formats
+		int flags = IMG_INIT_JPG | IMG_INIT_PNG;
+		int initted = IMG_Init(flags);
+		if ((initted & flags) != flags)
+		{
+			std::cerr << "IMG_Init: Failed to init required jpg and png support!\nIMG_Init: "
+				<< IMG_GetError() << "\n";
+			return false;
+		}
+
+		if (!m_texFox.Load("assets/textures/fox.jpg"))
+		{
+			std::cerr << "MainLoop::Init: Failed to load m_texFox!\n";
+			return false;
+		}
+
 		return true;
 	}
 
@@ -30,9 +60,11 @@ namespace K9
 	{
 		m_window.Shutdown();
 		m_imGUI.Shutdown();
+		Renderer2D::Ref().Shutdown();
 
 		// And quit SDL
 		SDL_Quit();
+		IMG_Quit();
 	}
 
 	void MainLoop::Run()
@@ -59,6 +91,8 @@ namespace K9
 	void MainLoop::Draw()
 	{
 		m_window.ClearScreen();
+		Renderer2D::Ref().PrepareDraw();
+		Renderer2D::Ref().DrawTexture(m_texFox, { 0, 0, 200, 200 }, SDL_RendererFlip::SDL_FLIP_VERTICAL);
 		OnImGUIRender();
 	}
 	void MainLoop::OnImGUIRender()
