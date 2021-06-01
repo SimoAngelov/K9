@@ -179,14 +179,17 @@ namespace K9
 	{
 		/* Set identity matrix. */
 		auto trans = glm::mat4(1.0f);
-		/* Draw from top left. */
-		trans = glm::translate(trans, glm::vec3(texture.GetWidth() * 0.5f, texture.GetHeight() * 0.5f, 0.0f));
 
-		/* Translate to x, y. */
-		trans = glm::translate(trans, glm::vec3(destRect.x, destRect.y, 0.0f));
+		/* Translate to top-left x, y. */
+		glm::vec3 pos(destRect.x + texture.GetWidth() * 0.5f, destRect.y + texture.GetHeight() * 0.5f, 0.0f);
+		trans = glm::translate(trans, pos);
+		
+		/* Translate to scaled top-left x, y. */
+		glm::vec3 posScaled((texture.GetWidth() - destRect.w) / -2.0f, (texture.GetHeight() - destRect.h) / -2.0f, 0.0f);
+		trans = glm::translate(trans, posScaled);
 
 		/* Scale by w, y */
-		auto scale = glm::vec3(destRect.w, destRect.h, 1.0f);
+		glm::vec3 scale(destRect.w, destRect.h, 1.0f);
 		
 		/* Set flip format. */
 		switch (flipFormat)
@@ -206,6 +209,29 @@ namespace K9
 
 		/* Draw quad */
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+	}
+
+	void Renderer2D::DrawTexture(const Texture& texture, const SDL_Rect& srcRect, const SDL_Rect& destRect, const SDL_RendererFlip& flipFormat)
+	{
+		float fDestW = static_cast<float>(destRect.w);
+		float fDestH = static_cast<float>(destRect.h);
+		float fSrcMinX = static_cast<float>(srcRect.x);
+		float fSrcMinY = static_cast<float>(srcRect.y);
+		float fSrcMaxX = static_cast<float>(srcRect.x + srcRect.w);
+		float fSrcMaxY = static_cast<float>(srcRect.y + srcRect.h);
+
+		VertexArray::SRectParam rectParam;
+		rectParam.m_minUV.x = fSrcMinX / fDestW;
+		rectParam.m_minUV.y = fSrcMinY / fDestH;
+		rectParam.m_maxUV.x = fSrcMaxX / fDestW;
+		rectParam.m_maxUV.y = fSrcMaxY / fDestH;
+
+		if (rectParam.CheckUV())
+		{
+			VertexArray va(rectParam);
+			va.SetActive();
+			DrawTexture(texture, destRect, flipFormat);
+		}
 	}
 
 	/* Private methods. */
@@ -371,22 +397,8 @@ namespace K9
 			return false;
 		}
 
-		constexpr unsigned int unVerticesCount = 4;
-		constexpr unsigned int unIndicesCount = 6;
-		float arrVertices[] = {
-			-0.5f, 0.5f, 0.f, 0.f, 0.f, /* Top-Left */
-			 0.5f, 0.5f, 0.f, 1.f, 0.f,	/* Top-Right */
-			 0.5f,-0.5f, 0.f, 1.f, 1.f,	/* Bottom-Right */
-			-0.5f,-0.5f, 0.f, 0.f, 1.f  /* Bottom-Left */
-		};
-
-		unsigned int arrIndices[] = {
-			0, 1, 2,
-			2, 3, 0
-		};
-
-		m_ptrVertexArray.reset(new VertexArray(arrVertices, unVerticesCount,
-			VertexArray::ELayout::ePosTex, arrIndices, unIndicesCount));
+		VertexArray::SRectParam rectParam{};
+		m_ptrVertexArray.reset(new VertexArray(rectParam));
 		return true;
 	}
 }

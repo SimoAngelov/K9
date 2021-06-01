@@ -49,6 +49,13 @@ namespace K9
 		/// </summary>
 		void OnImGUIRender();
 
+		void DrawColorPickWidget();
+		void DrawFoxWidgets();
+		void DrawSelectDrawWidget();
+		void DrawSrcRectWidget();
+		void DrawDestRectWidget();
+		void DrawFlipFormatWidget();
+
 	private:
 
 		/// <summary>
@@ -67,5 +74,11 @@ namespace K9
 		glm::vec4 m_imguiColor;
 
 		Texture m_texFox;
+
+		SDL_Rect m_srcRect;
+		SDL_Rect m_destRect;
+		SDL_RendererFlip m_flipFormat;
+		int m_nDrawIndex;
+		int m_nFlipFormatIndex;
 	};
 } // namespace K9

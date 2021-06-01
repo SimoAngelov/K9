@@ -138,8 +138,50 @@ target_include_directories(${BINARY} PUBLIC ${LIBS})
 
 # Link the source code library OS-specific libraries
 if(UNIX)
-    find_package(SDL2 REQUIRED)
-    target_link_libraries(${BINARY} PUBLIC SDL2)
+	#s Setup OpenGL
+	#cmake --help-policy CMP0072
+	set(OpenGL_GL_PREFERENCE GLVND) 
+	find_package(OpenGL REQUIRED)
+	target_link_libraries(${BINARY} PUBLIC opengl32)
+    add_definitions(-DGLFW_INCLUDE_NONE)
+
+    set(LIB_INCLUDE_PATH "")
+    set(LIB_TO_ADD "")
+    set(FILES_TO_COPY "")
+
+	# Setup SDL
+	# apt-get install -y libsdl2-image-2.0-0
+
+	INCLUDE(FindPkgConfig)
+	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+	PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
+	set(SDL2_IMAGE_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/libs/linux/SDL2/include)
+	set(SDL2_IMAGE_LIBRARIES "libSDL2_image-2.0.so.0")
+    target_include_directories(${BINARY} PUBLIC ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
+	target_link_libraries(${BINARY} PUBLIC GL ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+	message(STATUS " SDL2_INCLUDE_DIRS ${SDL2_INCLUDE_DIRS} \n SDL2_LIBRARIES ${SDL2_LIBRARIES}  \n SDL2_IMAGE_INCLUDE_DIRS ${SDL2_IMAGE_INCLUDE_DIRS} \nSDL2_IMAGE_LIBRARIES: ${SDL2_IMAGE_LIBRARIES}")
+
+
+	# Setup Glad
+	add_subdirectory(${LIBS}/Glad)
+    set_lib_glad("${LIB_PATH_GLAD}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
+	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+
+	# Setup GLM
+	add_subdirectory(${LIBS}/glm)
+    set_lib_glm("${LIB_PATH_GLM}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
+	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+
+	# Setup ImGUI
+	add_subdirectory(${LIBS}/imgui)
+    set_lib_imgui("${LIB_PATH_IMGUI}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
+	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+
+    # Copy assets folder to the build directory
+    copy_assets("assets" "${CMAKE_CURRENT_SOURCE_DIR}/copy_resources.cmake")
 endif(UNIX)
 if(WIN32)
 	#s Setup OpenGL

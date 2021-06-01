@@ -99,6 +99,10 @@ namespace K9
 		void DrawTexture(const Texture& texture, const SDL_Rect& destRect,
 						const SDL_RendererFlip& flipFormat = SDL_RendererFlip::SDL_FLIP_NONE);
 
+		/* Draw methods. */
+		void DrawTexture(const Texture& texture, const SDL_Rect& srcRect, const SDL_Rect& destRect,
+			const SDL_RendererFlip& flipFormat = SDL_RendererFlip::SDL_FLIP_NONE);
+
 	private:
 		Renderer2D();
 		virtual ~Renderer2D() = default;
