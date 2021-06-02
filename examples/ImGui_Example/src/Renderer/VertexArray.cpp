@@ -119,10 +119,10 @@ namespace K9
 		pointParam.SetPos(EPos::eBottomRight, glm::vec3{ rect.z, rect.w, 0.0f });
 		pointParam.SetPos(EPos::eBottomLeft, glm::vec3{ rect.x, rect.w, 0.0f });
 
-		pointParam.SetTexCoord(EPos::eTopLeft, glm::vec2{ minUV.x, minUV.y });
-		pointParam.SetTexCoord(EPos::eTopRight, glm::vec2{ maxUV.x, minUV.y });
-		pointParam.SetTexCoord(EPos::eBottomRight, glm::vec2{ maxUV.x, maxUV.y });
-		pointParam.SetTexCoord(EPos::eBottomLeft, glm::vec2{ minUV.x, maxUV.y });
+		pointParam.SetTexCoord(EPos::eTopLeft, glm::vec2{ minUV.x, maxUV.y });
+		pointParam.SetTexCoord(EPos::eTopRight, glm::vec2{ maxUV.x, maxUV.y });
+		pointParam.SetTexCoord(EPos::eBottomRight, glm::vec2{ maxUV.x, minUV.y });
+		pointParam.SetTexCoord(EPos::eBottomLeft, glm::vec2{ minUV.x, minUV.y });
 		SetVertexArray(pointParam);
 	}
 

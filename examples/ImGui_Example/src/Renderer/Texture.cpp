@@ -30,7 +30,7 @@ namespace K9
 			std::cerr << "Failed to load texture " << strFileName << "\n";
 			return false;
 		}
-		FlipSurface(surface);
+		//FlipSurface(surface);
 
 
 		m_nWidth = surface->w;

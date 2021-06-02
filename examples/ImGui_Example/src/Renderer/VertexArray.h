@@ -72,10 +72,10 @@ namespace K9
 				},
 				const std::array<glm::vec2, VERTEX_COUNT> arrTexCoords =
 				{
-					glm::vec2{0.0f, 0.0f},	/* Top-Left */
-					glm::vec2{1.0f, 0.0f },	/* Top-Right */
-					glm::vec2{1.0f, 1.0f},	/* Bottom-Right */
-					glm::vec2{0.0f, 1.0f}	/* Bottom-Left */
+					glm::vec2{0.0f, 1.0f},	/* Top-Left */
+					glm::vec2{1.0f, 1.0f },	/* Top-Right */
+					glm::vec2{1.0f, 0.0f},	/* Bottom-Right */
+					glm::vec2{0.0f, 0.0f}	/* Bottom-Left */
 
 				});
 
