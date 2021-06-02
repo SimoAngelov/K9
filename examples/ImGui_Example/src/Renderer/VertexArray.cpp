@@ -107,7 +107,7 @@ namespace K9
 
 	void VertexArray::SetVertexArray(const SRectParam& rectParam)
 	{
-		SPointParam pointParam{};
+		SPointParam pointParam;
 		pointParam.m_eLayout = rectParam.m_eLayout;
 
 		const auto& rect = rectParam.m_normalizedSize;
@@ -165,27 +165,27 @@ namespace K9
 
 	bool VertexArray::SRectParam::CheckUV()
 	{
-		if (m_minUV.x < 0.0f)
+		if (m_minUV.x < 0.0f || m_minUV.x > 1.0f)
 		{
 			std::cerr << " m_minUV.x(" << m_minUV.x << ") is invalid!\n";
 			return false;
 		}
 		
-		if (m_minUV.y > 1.0f)
+		if (m_minUV.y < 0.0f || m_minUV.y > 1.0f)
 		{
 			std::cerr << " m_minUV.y(" << m_minUV.y << ") is invalid\n";
 			return false;
 		}
 
-		if (m_maxUV.x < 0.0f)
+		if (m_maxUV.x < 0.0f || m_maxUV.x > 1.0f)
 		{
 			std::cerr << " m_maxUV.x(" << m_maxUV.x << ") is invalid!\n";
 			return false;
 		}
 
-		if (m_maxUV.y > 1.0f)
+		if (m_maxUV.y < 0.0f || m_maxUV.y > 1.0f)
 		{
-			std::cerr << " m_maxUV.y(" << m_minUV.y << ") is invalid\n";
+			std::cerr << " m_maxUV.y(" << m_maxUV.y << ") is invalid\n";
 			return false;
 		}
 

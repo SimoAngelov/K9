@@ -136,10 +136,52 @@ namespace K9
 	{
 		ImGui::NewLine();
 		ImGui::Text("Fox Source Rect");
-		ImGui::SliderInt("##foxSourceX", &m_srcRect.x, 0, m_texFox.GetWidth(), "m_srcRect.x %d");
-		ImGui::SliderInt("##foxSourceY", &m_srcRect.y, 0, m_texFox.GetHeight(), "m_srcRect.y %d");
-		ImGui::SliderInt("##foxSourceW", &m_srcRect.w, 0, m_texFox.GetWidth(), "m_srcRect.w %d");
-		ImGui::SliderInt("##foxSourceH", &m_srcRect.h, 0, m_texFox.GetHeight(), "m_srcRect.h %d");
+		if (ImGui::SliderInt("##foxSourceX", &m_srcRect.x, 0, m_texFox.GetWidth(), "m_srcRect.x %d"))
+		{
+			if (m_srcRect.x + m_srcRect.w > m_texFox.GetWidth())
+			{
+				m_srcRect.w = m_texFox.GetWidth() - m_srcRect.x;
+			}
+		}
+
+		if (ImGui::SliderInt("##foxSourceY", &m_srcRect.y, 0, m_texFox.GetHeight(), "m_srcRect.y %d"))
+		{
+			if (m_srcRect.y + m_srcRect.h > m_texFox.GetHeight())
+			{
+				m_srcRect.h = m_texFox.GetHeight() - m_srcRect.y;
+			}
+		}
+		
+		if (ImGui::SliderInt("##foxSourceW", &m_srcRect.w, 0, m_texFox.GetWidth(), "m_srcRect.w %d"))
+		{
+			if (m_srcRect.x + m_srcRect.w > m_texFox.GetWidth())
+			{
+				m_srcRect.x = m_texFox.GetWidth() - m_srcRect.w;
+			}
+		}
+
+		if (ImGui::SliderInt("##foxSourceH", &m_srcRect.h, 0, m_texFox.GetHeight(), "m_srcRect.h %d"))
+		{
+			if (m_srcRect.y + m_srcRect.h > m_texFox.GetHeight())
+			{
+				m_srcRect.y = m_texFox.GetHeight() - m_srcRect.h;
+			}
+		}
+		float fDestW = static_cast<float>(m_texFox.GetWidth());
+		float fDestH = static_cast<float>(m_texFox.GetHeight());
+		float fSrcMinX = static_cast<float>(m_srcRect.x);
+		float fSrcMinY = static_cast<float>(m_srcRect.y);
+		float fSrcMaxX = static_cast<float>(m_srcRect.x + m_srcRect.w);
+		float fSrcMaxY = static_cast<float>(m_srcRect.y + m_srcRect.h);
+		VertexArray::SRectParam rectParam;
+		rectParam.m_minUV.x = fSrcMinX / fDestW;
+		rectParam.m_minUV.y = fSrcMinY / fDestH;
+		rectParam.m_maxUV.x = fSrcMaxX / fDestW;
+		rectParam.m_maxUV.y = fSrcMaxY / fDestH;
+		ImGui::NewLine();
+		ImGui::Text("minUV{ x: %f,\t y: %f }\nmaxUV{ x: %f,\t y: %f }",
+			rectParam.m_minUV.x, rectParam.m_minUV.y,
+			rectParam.m_maxUV.x, rectParam.m_maxUV.y);
 	}
 
 	void MainLoop::DrawDestRectWidget()
@@ -154,5 +196,18 @@ namespace K9
 
 	void MainLoop::DrawFlipFormatWidget()
 	{
+		const char* items[] = { "Flip None", "Flip Horizontal", "Flip Vertical", "Flip Both"};
+		static int nCurrFlip = 0;
+		if (ImGui::ListBox("Select Flip Format", &nCurrFlip, items, IM_ARRAYSIZE(items), 4))
+		{
+			switch (nCurrFlip)
+			{
+			case 0: m_flipFormat = SDL_FLIP_NONE; break;
+			case 1: m_flipFormat = SDL_FLIP_HORIZONTAL; break;
+			case 2: m_flipFormat = SDL_FLIP_VERTICAL; break;
+			case 3: m_flipFormat = SDL_RendererFlip(SDL_FLIP_VERTICAL | SDL_FLIP_HORIZONTAL); break;
+			default: break;
+			}
+		}
 	}
 }

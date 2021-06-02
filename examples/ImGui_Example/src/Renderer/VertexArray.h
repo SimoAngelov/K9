@@ -65,10 +65,10 @@ namespace K9
 			SPointParam(ELayout eLayout = ELayout::ePosTex,
 				const std::array<glm::vec3, VERTEX_COUNT>& arrPos =
 				{
-					glm::vec3{-0.5f, 0.5f, 0.f},	/* Top-Left */
-					glm::vec3{ 0.5f, 0.5f, 0.f},	/* Top-Right */
-					glm::vec3{ 0.5f,-0.5f, 0.f},	/* Bottom-Right */
-					glm::vec3{-0.5f,-0.5f, 0.f}		/* Bottom-Left */
+					glm::vec3{-0.5f, 0.5f, 0.0f},	/* Top-Left */
+					glm::vec3{ 0.5f, 0.5f, 0.0f},	/* Top-Right */
+					glm::vec3{ 0.5f,-0.5f, 0.0f},	/* Bottom-Right */
+					glm::vec3{-0.5f,-0.5f, 0.0f}		/* Bottom-Left */
 				},
 				const std::array<glm::vec2, VERTEX_COUNT> arrTexCoords =
 				{
