@@ -57,16 +57,17 @@ add_custom_command(TARGET ${LIB} POST_BUILD        # Adds a post-build event to 
 endfunction()
 
 # Function to copy assets based on the provided script
-# arg[0] copy_assets - name of the function
-# arg[1] - argTarget - target dependency
-# arg[2] argCopyScriptPath - path to script that will copy the fo
-function(copy_assets argTarget argCopyScriptPath)
+# arg[0] - copy_assets - name of the function
+# arg[1] - argTarget - dependency target
+# arg[2] - argCopyScriptPath - path to script that will copy the folder
+# arg[3] - argFolderToCopy - folder to be copied
+function(copy_assets argTarget argCopyScriptPath argFolderToCopy)
 if((NOT "${argTarget}" STREQUAL "") AND (NOT "${argCopyScriptPath}" EQUAL ""))
         add_custom_target(${argTarget} 
-        COMMAND ${CMAKE_COMMAND} -DASSETS_PATH=${EXE_PATH} -P ${argCopyScriptPath}
+        COMMAND ${CMAKE_COMMAND} -DASSETS_SOURCE_DIR=${argFolderToCopy} -DASSETS_OUTPUT_DIR=${EXE_PATH} -P ${argCopyScriptPath}
     )
     add_dependencies(${LIB} ${argTarget})
-    message(STATUS "copy_assets argTarget: ${argTarget} \t argCopyScriptPath: ${argCopyScriptPath}")
+    message(STATUS "copy_assets argTarget: ${custom_target} \n argCopyScriptPath: ${argCopyScriptPath} \n argFolderToCopy: ${argFolderToCopy} \n EXE_PATH: ${EXE_PATH} ")
 endif()
 endfunction()
 
@@ -149,19 +150,19 @@ if(UNIX)
 
 	# Setup Glad
 	add_subdirectory(${LIBS}/Glad)
-    set_lib_glad("${LIB_PATH_GLAD}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    set_lib_k9_glad("${LIB_PATH_GLAD}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
 	# Setup GLM
 	add_subdirectory(${LIBS}/glm)
-    set_lib_glm("${LIB_PATH_GLM}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    set_lib_k9_glm("${LIB_PATH_GLM}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
 	# Setup ImGUI
 	add_subdirectory(${LIBS}/imgui)
-    set_lib_imgui("${LIB_PATH_IMGUI}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    set_lib_k9_imgui("${LIB_PATH_IMGUI}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
@@ -182,36 +183,37 @@ if(WIN32)
 
 	# Setup SDL
 	add_subdirectory(${LIBS}/SDL2)
-    set_lib_sdl2("${LIB_PATH_SDL}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY DEPENDENCY_TARGET)
+    set_lib_k9_sdl2("${LIB_PATH_SDL}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY DEPENDENCY_TARGET)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
     # Setup SDL_image
     add_subdirectory(${LIBS}/SDL2_image)
-    set_lib_sdl2_image("${LIB_PATH_SDL_IMAGE}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY DEPENDENCY_TARGET)
+    set_lib_k9_sdl2_image("${LIB_PATH_SDL_IMAGE}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY DEPENDENCY_TARGET)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
 	# Setup Glad
 	add_subdirectory(${LIBS}/Glad)
-    set_lib_glad("${LIB_PATH_GLAD}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    set_lib_k9_glad("${LIB_PATH_GLAD}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
 	# Setup GLM
 	add_subdirectory(${LIBS}/glm)
-    set_lib_glm("${LIB_PATH_GLM}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    set_lib_k9_glm("${LIB_PATH_GLM}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
 	# Setup ImGUI
 	add_subdirectory(${LIBS}/imgui)
-    set_lib_imgui("${LIB_PATH_IMGUI}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+    set_lib_k9_imgui("${LIB_PATH_IMGUI}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
 	message(INFO "K9_Renderer_include_list: ${K9_Renderer_include_list}")
 
     # Copy assets folder to the build directory
-    copy_assets("assets" "${CMAKE_CURRENT_SOURCE_DIR}/copy_resources.cmake")
+	# argTarget argDependency argCopyScriptPath argFolderToCopy
+    copy_assets("${LIB}_assets" "${CMAKE_CURRENT_SOURCE_DIR}/copy_resources.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 endif(WIN32)
