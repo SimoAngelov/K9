@@ -44,3 +44,7 @@ add_executable(${BINARY} ${source_file_list})
 
 target_include_directories(${BINARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src K9_Renderer_include_list)
 target_link_libraries(${BINARY} PUBLIC K9_Renderer)
+
+# Copy assets folder to the build directory
+	# argTarget argDependency argCopyScriptPath argFolderToCopy
+    copy_assets("${BINARY}" "${BINARY}_assets" "${CMAKE_CURRENT_SOURCE_DIR}/Renderer/copy_resources.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/assets")

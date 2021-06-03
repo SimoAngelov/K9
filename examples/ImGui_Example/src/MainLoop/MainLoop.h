@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include <Renderer/Texture.h>
+#include <Renderer/Font.h>
 
 namespace K9
 {
@@ -55,7 +56,9 @@ namespace K9
 		void DrawSrcRectWidget();
 		void DrawDestRectWidget();
 		void DrawFlipFormatWidget();
+		void DrawTextWidget();
 
+		void UpdateText(bool bSetRect = false);
 	private:
 
 		/// <summary>
@@ -80,5 +83,11 @@ namespace K9
 		SDL_RendererFlip m_flipFormat;
 		int m_nDrawIndex;
 		int m_nFlipFormatIndex;
+
+		Font m_font;
+		std::shared_ptr<Texture> m_text;
+		std::string m_strText;
+		SDL_Color m_textColor;
+		SDL_Rect m_textRect;
 	};
 } // namespace K9

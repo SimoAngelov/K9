@@ -8,7 +8,8 @@ namespace K9
 {
 	MainLoop::MainLoop() : m_event{}, m_isRunning{true}, m_imguiColor{},
 		m_srcRect{}, m_destRect{}, m_flipFormat{ SDL_RendererFlip::SDL_FLIP_NONE },
-		m_nDrawIndex{0}, m_nFlipFormatIndex{0}
+		m_nDrawIndex{ 0 }, m_nFlipFormatIndex{ 0 }, m_font{}, m_text{ nullptr },
+		m_strText{ "" }, m_textColor{ 255, 255, 255, 255 }, m_textRect{}
 	{
 	}
 
@@ -28,14 +29,23 @@ namespace K9
 			std::cerr << "MainLoop::Init: Failed to load m_texFox!\n";
 			return false;
 		}
+		if (!m_font.Load("assets/fonts/BLKCHCRY.TTF"))
+		{
+			std::cerr << "MainLoop::Init: Failed to init m_font!\n";
+			return false;
+		}
 		m_srcRect = { 0, 0, m_texFox.GetWidth(), m_texFox.GetHeight() };
 		m_destRect = m_srcRect;
+
+		m_strText = "Foxy Fox";
+		UpdateText(true);
 
 		return true;
 	}
 
 	void MainLoop::Shutdown()
 	{
+		m_font.Unload();
 		Renderer2D::Ref().Shutdown();		
 	}
 
@@ -66,13 +76,17 @@ namespace K9
 
 		if (m_nDrawIndex == 0)
 		{
-			Renderer2D::Ref().DrawTexture(m_texFox, m_destRect, m_flipFormat);
+			Renderer2D::Ref().DrawTexture(m_texFox, m_destRect,
+				SDL_Color{ 255, 255, 255, 255 }, m_flipFormat);
 		}
 		else if (m_nDrawIndex == 1)
 		{
-			Renderer2D::Ref().DrawTexture(m_texFox, m_srcRect, m_destRect, m_flipFormat);
+			Renderer2D::Ref().DrawTexture(m_texFox, m_srcRect, m_destRect,
+				SDL_Color{ 255, 255, 255, 255 }, m_flipFormat);
 		}
 
+
+		Renderer2D::Ref().DrawTexture(m_text, m_textRect, m_textColor);
 		
 		OnImGUIRender();
 		Renderer2D::Ref().EndFrame();
@@ -97,6 +111,9 @@ namespace K9
 		if (ImGui::ColorPicker4("##picker", (float*)&m_imguiColor))
 		{
 			Renderer2D::Ref().SetBackgroundColor(m_imguiColor);
+			m_textColor.r = std::abs(255 - 255 * m_imguiColor.r);
+			m_textColor.g = std::abs(255 - 255 * m_imguiColor.g);
+			m_textColor.b = std::abs(255 - 255 * m_imguiColor.b);
 		}
 	}
 
@@ -111,6 +128,8 @@ namespace K9
 		DrawSrcRectWidget();
 		ImGui::Separator();
 		DrawDestRectWidget();
+		ImGui::Separator();
+		DrawTextWidget();
 
 		ImGui::NewLine();
 		ImGui::Separator();
@@ -119,6 +138,10 @@ namespace K9
 			m_srcRect = { 0, 0, m_texFox.GetWidth(), m_texFox.GetHeight() };
 			m_destRect = m_srcRect;
 			m_flipFormat = SDL_RendererFlip::SDL_FLIP_NONE;
+			if (m_text)
+			{
+				m_textRect = { 0, 0, m_text->GetWidth(), m_text->GetHeight() };
+			}
 		}
 	}
 
@@ -207,6 +230,29 @@ namespace K9
 			case 2: m_flipFormat = SDL_FLIP_VERTICAL; break;
 			case 3: m_flipFormat = SDL_RendererFlip(SDL_FLIP_VERTICAL | SDL_FLIP_HORIZONTAL); break;
 			default: break;
+			}
+		}
+	}
+
+	void MainLoop::DrawTextWidget()
+	{
+		ImGui::Text("Text Dest Rect");
+		const auto& screenSize = Renderer2D::Ref().GetScreenSize();
+		ImGui::SliderInt("##textDestX", &m_textRect.x, 0, screenSize.w, "m_textRect.x %d");
+		ImGui::SliderInt("##textDestY", &m_textRect.y, 0, screenSize.h, "m_textRect.y %d");
+		ImGui::SliderInt("##textDestW", &m_textRect.w, 0, screenSize.w, "m_textRect.w %d");
+		ImGui::SliderInt("##textDestH", &m_textRect.h, 0, screenSize.h, "m_textRect.h %d");
+	}
+
+	void MainLoop::UpdateText(bool bSetRect)
+	{
+		m_text = m_font.RenderText(m_strText, m_textColor);
+		if (m_text)
+		{
+			if (bSetRect)
+			{
+				m_textRect.w = m_text->GetWidth();
+				m_textRect.h = m_text->GetHeight();
 			}
 		}
 	}

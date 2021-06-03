@@ -96,11 +96,27 @@ namespace K9
 		void SetBackgroundColor(const glm::vec4& bgrColor);
 
 		/* Draw methods. */
+		/// <summary>
+		/// Draw a texture with a destination rect and flip format.
+		/// </summary>
 		void DrawTexture(const Texture& texture, const SDL_Rect& destRect,
+						const SDL_Color& color = { 255, 255, 255, 255 },
 						const SDL_RendererFlip& flipFormat = SDL_RendererFlip::SDL_FLIP_NONE);
+		void DrawTexture(const std::shared_ptr<Texture>& texture,
+			const SDL_Rect& destRect,
+			const SDL_Color& color = { 255, 255, 255, 255 },
+			const SDL_RendererFlip& flipFormat = SDL_RendererFlip::SDL_FLIP_NONE);
 
-		/* Draw methods. */
+		/// <summary>
+		/// Draw a texture with a source rect, destination rect and flip format.
+		/// </summary>
 		void DrawTexture(const Texture& texture, const SDL_Rect& srcRect, const SDL_Rect& destRect,
+			const SDL_Color& color = {255, 255, 255, 255},
+			const SDL_RendererFlip& flipFormat = SDL_RendererFlip::SDL_FLIP_NONE);
+		void DrawTexture(const std::shared_ptr<Texture>& texture,
+			const SDL_Rect& srcRect,
+			const SDL_Rect& destRect,
+			const SDL_Color& color = { 255, 255, 255, 255 },
 			const SDL_RendererFlip& flipFormat = SDL_RendererFlip::SDL_FLIP_NONE);
 
 	private:
@@ -128,6 +144,16 @@ namespace K9
 		/// Destroy SDL Image.
 		/// </summary>
 		void DestroySDLImage();
+
+		/// <summary>
+		/// Init SDL ttf.
+		/// </summary>
+		bool InitSDLttf();
+
+		/// <summary>
+		/// Destroy SDL ttf.
+		/// </summary>
+		void DestroySDLttf();
 
 		/// <summary>
 		/// Create a window for rendering.

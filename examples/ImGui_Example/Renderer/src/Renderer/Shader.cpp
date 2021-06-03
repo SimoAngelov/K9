@@ -70,6 +70,13 @@ namespace K9
 		glUniformMatrix4fv(loc, unMatrixCount, GL_FALSE, glm::value_ptr(arrMatrices[0]));
 	}
 
+	void Shader::SetVectorUniform(const char* cstrName, const glm::vec4& vec4DValue)
+	{
+		GLuint loc = glGetUniformLocation(m_unShaderProgramID, cstrName);
+		/* Send the vector data */
+		glUniform4fv(loc, 1, glm::value_ptr(vec4DValue));
+	}
+
 	void Shader::SetVectorUniform(const char* cstrName, const glm::vec3& vec3DValue)
 	{
 		GLuint loc = glGetUniformLocation(m_unShaderProgramID, cstrName);

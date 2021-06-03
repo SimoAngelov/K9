@@ -17,6 +17,7 @@ namespace K9
 
 	Texture::~Texture()
 	{
+		Unload();
 	}
 
 	bool Texture::Load(const std::string& strFileName)

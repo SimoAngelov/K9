@@ -58,16 +58,17 @@ endfunction()
 
 # Function to copy assets based on the provided script
 # arg[0] - copy_assets - name of the function
-# arg[1] - argTarget - dependency target
+# arg[1] - argTarget - target of the dependency
+# arg[2] - argDependency - dependency to be added
 # arg[2] - argCopyScriptPath - path to script that will copy the folder
 # arg[3] - argFolderToCopy - folder to be copied
-function(copy_assets argTarget argCopyScriptPath argFolderToCopy)
+function(copy_assets argTarget argDependency argCopyScriptPath argFolderToCopy)
 if((NOT "${argTarget}" STREQUAL "") AND (NOT "${argCopyScriptPath}" EQUAL ""))
-        add_custom_target(${argTarget} 
+        add_custom_target(${argDependency} 
         COMMAND ${CMAKE_COMMAND} -DASSETS_SOURCE_DIR=${argFolderToCopy} -DASSETS_OUTPUT_DIR=${EXE_PATH} -P ${argCopyScriptPath}
     )
-    add_dependencies(${LIB} ${argTarget})
-    message(STATUS "copy_assets argTarget: ${custom_target} \n argCopyScriptPath: ${argCopyScriptPath} \n argFolderToCopy: ${argFolderToCopy} \n EXE_PATH: ${EXE_PATH} ")
+    add_dependencies(${argTarget} ${argDependency})
+    message(STATUS "copy_assets argTarget: ${argTarget} \n argDependency: ${argDependency} \n argCopyScriptPath: ${argCopyScriptPath} \n argFolderToCopy: ${argFolderToCopy} \n EXE_PATH: ${EXE_PATH} ")
 endif()
 endfunction()
 
@@ -193,6 +194,12 @@ if(WIN32)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
+    # Setup SDL_ttf
+    add_subdirectory(${LIBS}/SDL2_ttf)
+    set_lib_k9_sdl2_ttf("${LIB_PATH_SDL_TTF}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY DEPENDENCY_TARGET)
+    add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
+	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+
 	# Setup Glad
 	add_subdirectory(${LIBS}/Glad)
     set_lib_k9_glad("${LIB_PATH_GLAD}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
@@ -215,5 +222,5 @@ if(WIN32)
 
     # Copy assets folder to the build directory
 	# argTarget argDependency argCopyScriptPath argFolderToCopy
-    copy_assets("${LIB}_assets" "${CMAKE_CURRENT_SOURCE_DIR}/copy_resources.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+    copy_assets("${LIB}" "${LIB}_assets" "${CMAKE_CURRENT_SOURCE_DIR}/copy_resources.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 endif(WIN32)

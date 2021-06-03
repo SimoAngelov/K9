@@ -21,6 +21,8 @@ namespace K9
 		void SetMatrixUniform(const char* cstrName, const glm::mat4& mat4Value);
 		/* Set an array of matrix uniforms */
 		void SetMatrixUniforms(const char* cstrName, glm::mat4* arrMatrices, unsigned int unMatrixCount);
+		/* Sets a Vector4D uniform */
+		void SetVectorUniform(const char* cstrName, const glm::vec4& vec4DValue);
 		/* Sets a Vector3D uniform */
 		void SetVectorUniform(const char* cstrName, const glm::vec3& vec3DValue);
 		/* Sets a Vector2D uniform */

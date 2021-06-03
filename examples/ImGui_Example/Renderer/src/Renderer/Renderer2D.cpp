@@ -1,8 +1,12 @@
 #include "Renderer2D.h"
+#include "Renderer2D.h"
+#include "Renderer2D.h"
 #include <array>
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glad/glad.h>
+#include <SDL_ttf.h>
+
 #include "Texture.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
@@ -32,6 +36,12 @@ namespace K9
 		if (!InitSDLImage())
 		{
 			std::cerr << "Renderer2D::Init Failed to init SDL Image!\n";
+		}
+
+		if (!InitSDLttf())
+		{
+			std::cerr << "Renderer2D::Init Failed to Init SDL ttf!\n";
+			return false;
 		}
 
 		if (!InitWindow(strTitle, nWidth, nHeight))
@@ -65,6 +75,7 @@ namespace K9
 
 	void Renderer2D::Shutdown()
 	{
+
 		/* Destroy the window. */
 		DestroyWindow();
 
@@ -79,6 +90,9 @@ namespace K9
 
 		/* Destroy SDL image. */
 		DestroySDLImage();
+
+		/* Destroy SDL ttf. */
+		DestroySDLttf();
 	}
 
 	SDL_GLContext Renderer2D::GetContext()
@@ -174,7 +188,9 @@ namespace K9
 		glClearColor(m_bgrColor.r, m_bgrColor.g, m_bgrColor.b, m_bgrColor.a);
 	}
 
-	void Renderer2D::DrawTexture(const Texture& texture, const SDL_Rect& destRect,
+	void Renderer2D::DrawTexture(const Texture& texture,
+								const SDL_Rect& destRect,
+								const SDL_Color& color,
 								const SDL_RendererFlip& flipFormat)
 	{
 		/* Set identity matrix. */
@@ -204,6 +220,10 @@ namespace K9
 		m_ptrShader->SetMatrixUniform("u_WorldTransform", trans);
 		m_ptrShader->SetMatrixUniform("u_ViewProj", m_projectionMatrix);
 
+		/* Set color. */
+		glm::vec4 normalizedColor{ color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f };
+		m_ptrShader->SetVectorUniform("u_Color", normalizedColor);
+
 		/* Set current texture */
 		texture.SetActive();
 
@@ -211,7 +231,26 @@ namespace K9
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void Renderer2D::DrawTexture(const Texture& texture, const SDL_Rect& srcRect, const SDL_Rect& destRect, const SDL_RendererFlip& flipFormat)
+	void Renderer2D::DrawTexture(const std::shared_ptr<Texture>& texture,
+		const SDL_Rect& destRect,
+		const SDL_Color& color,
+		const SDL_RendererFlip& flipFormat)
+	{
+		if (texture)
+		{
+			DrawTexture(*texture, destRect, color, flipFormat);
+		}
+		else
+		{
+			std::cerr << "Renderer2D::DrawTexture error! texture is nullptr!\n";
+		}
+	}
+
+	void Renderer2D::DrawTexture(const Texture& texture,
+								const SDL_Rect& srcRect,
+								const SDL_Rect& destRect,
+								const SDL_Color& color,
+								const SDL_RendererFlip& flipFormat)
 	{
 		float fDestW = static_cast<float>(destRect.w);
 		float fDestH = static_cast<float>(destRect.h);
@@ -230,7 +269,23 @@ namespace K9
 		{
 			VertexArray va(rectParam);
 			va.SetActive();
-			DrawTexture(texture, destRect, flipFormat);
+			DrawTexture(texture, destRect, color, flipFormat);
+		}
+	}
+
+	void Renderer2D::DrawTexture(const std::shared_ptr<Texture>& texture,
+								const SDL_Rect& srcRect,
+								const SDL_Rect& destRect,
+								const SDL_Color& color,
+								const SDL_RendererFlip& flipFormat)
+	{
+		if (texture)
+		{
+			DrawTexture(*texture, srcRect, destRect, color, flipFormat);
+		}
+		else
+		{
+			std::cerr << "Renderer2D::DrawTexture error! texture is nullptr!\n";
 		}
 	}
 
@@ -245,7 +300,7 @@ namespace K9
 	bool Renderer2D::InitSDL()
 	{
 		/* Initialize SDL with video. */
-		int nStatus = SDL_Init(SDL_INIT_VIDEO);
+		int nStatus = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 		if (nStatus != 0)
 		{
 			std::cerr << "Failed to Init SDL!";
@@ -277,6 +332,22 @@ namespace K9
 	void Renderer2D::DestroySDLImage()
 	{
 		IMG_Quit();
+	}
+
+	bool Renderer2D::InitSDLttf()
+	{
+		/* Initialize SDL_ttf */
+		if (TTF_Init() != 0)
+		{
+			std::cerr << "Failed to initialize SDL_TTF!\n";
+			return false;
+		}
+		return true;
+	}
+
+	void Renderer2D::DestroySDLttf()
+	{
+		TTF_Quit();
 	}
 
 	bool Renderer2D::InitWindow(const std::string& strTitle, int nWidth, int nHeight)
