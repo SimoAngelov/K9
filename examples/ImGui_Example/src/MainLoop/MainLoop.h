@@ -50,6 +50,7 @@ namespace K9
 		/// </summary>
 		void OnImGUIRender();
 
+		void DrawAudioWidget();
 		void DrawColorPickWidget();
 		void DrawFoxWidgets();
 		void DrawSelectDrawWidget();

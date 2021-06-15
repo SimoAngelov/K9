@@ -200,6 +200,12 @@ if(WIN32)
     add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
 	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
 
+    # Setup SDL_mixer
+    add_subdirectory(${LIBS}/SDL2_mixer)
+    set_lib_k9_sdl2_mixer("${LIB_PATH_SDL_MIXER}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY DEPENDENCY_TARGET)
+    add_lib_windows("${LIB_INCLUDE_PATH}" "${LIB_TO_ADD}" "${FILES_TO_COPY}")
+	reset_lib_variables(LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)
+
 	# Setup Glad
 	add_subdirectory(${LIBS}/Glad)
     set_lib_k9_glad("${LIB_PATH_GLAD}" LIB_INCLUDE_PATH LIB_TO_ADD FILES_TO_COPY)

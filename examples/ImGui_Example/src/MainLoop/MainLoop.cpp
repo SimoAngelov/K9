@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include <Renderer/Renderer2D.h>
+#include <Audio/Audio.h>
 
 namespace K9
 {
@@ -21,6 +22,12 @@ namespace K9
 		if (!Renderer2D::Ref().Init("ImGUI Example", nWidth, nHeight))
 		{
 			std::cerr << "MainLoop::Init: Failed to init Renderer2D\n";
+			return false;
+		}
+		
+		if (!Music::Ref().Init("assets/sounds/music.csv"))
+		{
+			std::cerr << "MainLoop::Init: Failed to init Audio\n";
 			return false;
 		}
 
@@ -46,7 +53,8 @@ namespace K9
 	void MainLoop::Shutdown()
 	{
 		m_font.Unload();
-		Renderer2D::Ref().Shutdown();		
+		Renderer2D::Ref().Shutdown();
+		Music::Ref().Shutdown();
 	}
 
 	void MainLoop::Run()
@@ -103,6 +111,36 @@ namespace K9
 		Renderer2D::Ref().EndImGUIFrame();
 	}
 
+	void MainLoop::DrawAudioWidget()
+	{
+		static constexpr auto SOUND_ID{ "Sonic_Blaster" };
+		auto& music = Music::Ref();
+
+		if (ImGui::Button("Play sound"))
+		{
+			music.Play(SOUND_ID);
+		}
+		if (ImGui::Button("Pause sound"))
+		{
+			music.Pause();
+		}
+		if (ImGui::Button("Resume sound"))
+		{
+			music.Unpause();
+		}
+		if (ImGui::Button("Stop sound"))
+		{
+			music.Stop();
+		}
+
+		static int nVolume = music.GetVolume();
+		if (ImGui::SliderInt("##setVolume", &nVolume, 0,
+			music.GetMaxVolume(), "The volume is %d"))
+		{
+			music.SetVolume(nVolume);
+		}
+	}
+
 	void MainLoop::DrawColorPickWidget()
 	{
 		ImGui::NewLine();
@@ -119,6 +157,9 @@ namespace K9
 
 	void MainLoop::DrawFoxWidgets()
 	{
+		ImGui::NewLine();
+		ImGui::Separator();
+		DrawAudioWidget();
 		ImGui::NewLine();
 		ImGui::Separator();
 		DrawSelectDrawWidget();
