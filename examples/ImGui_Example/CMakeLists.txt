@@ -3,17 +3,17 @@ cmake_minimum_required(VERSION 3.7.2)
 # Name of the project
 project(ImGUI_Example)
 
+# Set the exe path for the K9_renderer
+set(EXE_PATH ${CMAKE_CURRENT_BINARY_DIR})
+
 message(STATUS "${PROJECT_NAME} is located in ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Specify C++14 as the standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
 message(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
-set(EXE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-
 
 # Output compiler Information and build type
 message(STATUS "====== Current compiler is: ${CMAKE_CXX_COMPILER} ======")
@@ -46,5 +46,14 @@ target_include_directories(${BINARY} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src K9_R
 target_link_libraries(${BINARY} PUBLIC K9_Renderer)
 
 # Copy assets folder to the build directory
-	# argTarget argDependency argCopyScriptPath argFolderToCopy
-    copy_assets("${BINARY}" "${BINARY}_assets" "${CMAKE_CURRENT_SOURCE_DIR}/Renderer/copy_resources.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+# argTarget argDependency argCopyScriptPath argFolderToCopy argFolderDestination
+copy_assets("${BINARY}"
+			"${BINARY}_assets"
+			"${K9_LIB_ASSET_COPY_SCRIPT_PATH}"
+			"${CMAKE_CURRENT_SOURCE_DIR}/assets"
+			"${CMAKE_CURRENT_BINARY_DIR}")
+copy_assets("${K9_LIB_ASSET_TARGET}"
+			"${K9_LIB_ASSET_DEPENDENCY}"
+			"${K9_LIB_ASSET_COPY_SCRIPT_PATH}"
+			"${K9_LIB_ASSET_FOLDER_TO_COPY}"
+			"${CMAKE_CURRENT_BINARY_DIR}")

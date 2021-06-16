@@ -6,13 +6,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Name of the library
 set(LIB "K9_Renderer")
-set(${LIB}_include_list "")
+set(K9_Renderer_include_list "")
 
-# IMPORTANT: EXE_PATH must be set to in the project CMakeLists.txt
+# Set variables to be used by the client when copying library assets.
+# argTarget argDependency argCopyScriptPath argFolderToCopy
+set(K9_LIB_ASSET_TARGET "${LIB}" PARENT_SCOPE)
+set(K9_LIB_ASSET_DEPENDENCY "${LIB}_assets" PARENT_SCOPE)
+set(K9_LIB_ASSET_COPY_SCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/copy_resources.cmake" PARENT_SCOPE)
+set(K9_LIB_ASSET_FOLDER_TO_COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" PARENT_SCOPE)
 
 message(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
-message(STATUS "EXE_PATH: ${EXE_PATH}")
 
 # Macro for gathering all include paths recursively
 # arg[0] The macro name
@@ -33,7 +37,7 @@ ENDMACRO()
 # arg[0] The macro name
 # arg[1] Output variable where all the source files will be written
 # arg[2] Current path from which to start looking recursively
-MACRO(SOURCE_FILES return_list curr_dir)
+macro(SOURCE_FILES return_list curr_dir)
     FILE(GLOB_RECURSE new_list ${curr_dir}/*.h ${curr_dir}/*.cpp ${curr_dir}/*.hpp ${curr_dir}/*.inl)
     SET(dir_list "")
     FOREACH(file_path ${new_list})
@@ -42,13 +46,13 @@ MACRO(SOURCE_FILES return_list curr_dir)
     ENDFOREACH()
     LIST(REMOVE_DUPLICATES dir_list)
     SET(${return_list} ${dir_list})
-ENDMACRO()
+endmacro()
 
 # Function for copying the specified file path to the output directory where the executable is located
 # arg[0] - post_build_copy - name of the function
 # arg[1] - argFileToCopy - file to be copied
 function(post_build_copy argFileToCopy)
-    message(STATUS "[INFO]\n\n\n post_build_copy  ${PROJECT_NAME} \n\t\t copying argFileToCopy: ${argFileToCopy}\n\t\t to CMAKE_CURRENT_BINARY_DIR:  ${CMAKE_CURRENT_BINARY_DIR}\n")
+    message(STATUS "[INFO]\n\n\n post_build_copy  ${PROJECT_NAME} \n\t\t copying argFileToCopy: ${argFileToCopy}\n\t\t to EXE_PATH:  ${EXE_PATH}\n")
 
 add_custom_command(TARGET ${LIB} POST_BUILD        # Adds a post-build event to ${PROJECT_NAME}
     COMMAND ${CMAKE_COMMAND} -E copy_if_different           # which executes "cmake - E copy_if_different..."
@@ -62,13 +66,15 @@ endfunction()
 # arg[2] - argDependency - dependency to be added
 # arg[2] - argCopyScriptPath - path to script that will copy the folder
 # arg[3] - argFolderToCopy - folder to be copied
-function(copy_assets argTarget argDependency argCopyScriptPath argFolderToCopy)
-if((NOT "${argTarget}" STREQUAL "") AND (NOT "${argCopyScriptPath}" EQUAL ""))
+# arg[4] - argFolderDestination - destination folder where the files will be copied.
+function(copy_assets argTarget argDependency argCopyScriptPath argFolderToCopy argFolderDestination)
+message(STATUS "copy_assets -> argTarget: ${argTarget} \n argDependency: ${argDependency} \n argCopyScriptPath: ${argCopyScriptPath} \n argFolderToCopy: ${argFolderToCopy} \n argFolderDestination: ${argFolderDestination} ")
+if((NOT "${argTarget}" STREQUAL "") AND (NOT "${argCopyScriptPath}" STREQUAL "") AND (NOT "${argFolderDestination}" STREQUAL ""))
+        message(STATUS "copy_assets -> execute custom command")
         add_custom_target(${argDependency} 
-        COMMAND ${CMAKE_COMMAND} -DASSETS_SOURCE_DIR=${argFolderToCopy} -DASSETS_OUTPUT_DIR=${EXE_PATH} -P ${argCopyScriptPath}
+        COMMAND ${CMAKE_COMMAND} -DASSETS_SOURCE_DIR=${argFolderToCopy} -DASSETS_OUTPUT_DIR=${argFolderDestination} -P ${argCopyScriptPath}
     )
     add_dependencies(${argTarget} ${argDependency})
-    message(STATUS "copy_assets argTarget: ${argTarget} \n argDependency: ${argDependency} \n argCopyScriptPath: ${argCopyScriptPath} \n argFolderToCopy: ${argFolderToCopy} \n EXE_PATH: ${EXE_PATH} ")
 endif()
 endfunction()
 
@@ -77,7 +83,7 @@ endfunction()
 # arg[1] - argIncludePath - path to the library include directory
 # arg[2] - argLibsToAdd - name of the libraries to be added
 # arg[3] - argFilesToCopy - files to be copied after build is finished. "" if there're none.
-function(add_lib_windows argIncludePath argLibsToAdd argFilesToCopy )
+function(add_lib_windows argIncludePath argLibsToAdd argFilesToCopy)
 
     if(NOT "${argIncludePath}" STREQUAL "")
 	    # Add the include directory to the project
@@ -226,7 +232,4 @@ if(WIN32)
 
 	message(INFO "K9_Renderer_include_list: ${K9_Renderer_include_list}")
 
-    # Copy assets folder to the build directory
-	# argTarget argDependency argCopyScriptPath argFolderToCopy
-    copy_assets("${LIB}" "${LIB}_assets" "${CMAKE_CURRENT_SOURCE_DIR}/copy_resources.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/assets")
 endif(WIN32)
