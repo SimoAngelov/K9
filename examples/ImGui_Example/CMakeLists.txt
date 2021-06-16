@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 3.7.2)
 # Name of the project
 project(ImGUI_Example)
 
-# Set the exe path for the K9_renderer
-set(EXE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-
 message(STATUS "${PROJECT_NAME} is located in ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Specify C++14 as the standard
