@@ -49,11 +49,18 @@ target_link_libraries(${BINARY} PUBLIC K9_Renderer)
 # argTarget argDependency argCopyScriptPath argFolderToCopy argFolderDestination
 copy_assets("${BINARY}"
 			"${BINARY}_assets"
-			"${K9_LIB_ASSET_COPY_SCRIPT_PATH}"
+			"${K9_ASSET_COPY_SCRIPT_PATH}"
 			"${CMAKE_CURRENT_SOURCE_DIR}/assets"
 			"${CMAKE_CURRENT_BINARY_DIR}")
-copy_assets("${K9_LIB_ASSET_TARGET}"
-			"${K9_LIB_ASSET_DEPENDENCY}"
-			"${K9_LIB_ASSET_COPY_SCRIPT_PATH}"
-			"${K9_LIB_ASSET_FOLDER_TO_COPY}"
+
+copy_assets("${K9_ASSET_TARGET}"
+			"${K9_ASSET_DEPENDENCY}"
+			"${K9_ASSET_COPY_SCRIPT_PATH}"
+			"${K9_ASSET_FOLDER_TO_COPY}"
+			"${CMAKE_CURRENT_BINARY_DIR}")
+message(status "Client K9_LIBS_TO_COPY: ${K9_LIBS_TO_COPY}")
+copy_asset_list("${K9_LIB_TARGET}"
+			"${K9_LIB_DEPENDENCY}"
+			"${K9_LIB_COPY_SCRIPT_PATH}"
+			"${K9_LIBS_TO_COPY}"
 			"${CMAKE_CURRENT_BINARY_DIR}")
