@@ -43,7 +43,7 @@ ENDMACRO()
 # arg[1] Output variable where all the source files will be written
 # arg[2] Current path from which to start looking recursively
 macro(SOURCE_FILES return_list curr_dir)
-    FILE(GLOB_RECURSE new_list ${curr_dir}/*.h ${curr_dir}/*.cpp ${curr_dir}/*.hpp ${curr_dir}/*.inl)
+    FILE(GLOB_RECURSE new_list ${curr_dir}/*.h ${curr_dir}/*.cpp ${curr_dir}/*.hpp ${curr_dir}/*.inl ${curr_dir}/*.c)
     SET(dir_list "")
     FOREACH(file_path ${new_list})
         message(STATUS "[INFO] file_path: ${file_path}")
