@@ -137,6 +137,13 @@ namespace K9
 			else
 				nFormat = GL_BGR;
 		}
+		else if (nChannelCount == 1)
+		{
+			if (ptrSurface->format->Rmask == 0x000000ff)
+				nFormat = GL_RGBA;
+			else
+				nFormat = GL_BGRA;
+		}
 		else {
 			std::cerr << "Warning: the image is not truecolor..  this will probably break!\n";
 			return false;

@@ -252,8 +252,8 @@ namespace K9
 								const SDL_Color& color,
 								const SDL_RendererFlip& flipFormat)
 	{
-		float fDestW = static_cast<float>(destRect.w);
-		float fDestH = static_cast<float>(destRect.h);
+		float fDestW = static_cast<float>(texture.GetWidth());
+		float fDestH = static_cast<float>(texture.GetHeight());
 		float fSrcMinX = static_cast<float>(srcRect.x);
 		float fSrcMinY = static_cast<float>(srcRect.y);
 		float fSrcMaxX = static_cast<float>(srcRect.x + srcRect.w);
